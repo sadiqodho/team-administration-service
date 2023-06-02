@@ -1,6 +1,5 @@
 package com.team.administration.services;
 
-import com.team.administration.exceptions.ResourceAlreadyExistsException;
 import com.team.administration.exceptions.ResourceNotFoundException;
 import com.team.administration.models.User;
 import com.team.administration.repositories.UserRepository;
@@ -15,7 +14,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final String USER_NOT_FOUND_EXCEPTION = "User not found Exception: ";
-    private final String GIT_HUB_URL_FOUND_EXCEPTION = "Gitlab URL already exits!";
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -33,19 +31,12 @@ public class UserService {
     }
 
     public User addUser(User user) {
-        if (userRepository.doesGitHubProfileURLExits(user.getGitHubProfileURL())) {
-            throw new ResourceAlreadyExistsException(GIT_HUB_URL_FOUND_EXCEPTION);
-        }
         return userRepository.save(user);
     }
 
     public User updateUser(User user) {
         if (!userRepository.existsById(user.getId())) {
             throw new ResourceNotFoundException(USER_NOT_FOUND_EXCEPTION + user.getId());
-        }
-
-        if (userRepository.doesGitHubProfileURLExits(user.getGitHubProfileURL(), user.getId())) {
-            throw new ResourceAlreadyExistsException(GIT_HUB_URL_FOUND_EXCEPTION);
         }
         return userRepository.save(user);
     }

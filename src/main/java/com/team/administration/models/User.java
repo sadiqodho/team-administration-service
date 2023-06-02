@@ -1,5 +1,6 @@
 package com.team.administration.models;
 
+import com.team.administration.enums.Position;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +23,10 @@ public class User {
     @NotNull
     @NotEmpty
     private String lastName;
-    private String position;
+
+    @Enumerated(EnumType.STRING)
+    private Position position;
     @URL
+    @Column(name = "github_profile_url", unique = true)
     private String gitHubProfileURL;
 }

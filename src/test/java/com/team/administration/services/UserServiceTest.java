@@ -1,6 +1,6 @@
 package com.team.administration.services;
 
-import com.team.administration.exceptions.ResourceAlreadyExistsException;
+import com.team.administration.enums.Position;
 import com.team.administration.exceptions.ResourceNotFoundException;
 import com.team.administration.models.User;
 import com.team.administration.repositories.UserRepository;
@@ -26,7 +26,6 @@ class UserServiceTest {
     private User user;
 
     private final String USER_NOT_FOUND_EXCEPTION = "User not found Exception: ";
-    private final String GIT_HUB_URL_FOUND_EXCEPTION = "Gitlab URL already exits!";
 
     @BeforeEach
     void setUp() {
@@ -35,7 +34,7 @@ class UserServiceTest {
         user.setId(1L);
         user.setFirstName("MyFirstName");
         user.setFirstName("MyLastName");
-        user.setPosition("MyPosition");
+        user.setPosition(Position.DEVELOPER);
         user.setGitHubProfileURL("https://github.com/xyz");
     }
 
@@ -77,16 +76,6 @@ class UserServiceTest {
     }
 
     @Test
-    void canNotAddUserGithubURLAlreadyFoundException() {
-        BDDMockito.given(userRepository.doesGitHubProfileURLExits(anyString()))
-                .willReturn(true);
-        assertThatThrownBy(()-> userService.addUser(user))
-                .isInstanceOf(ResourceAlreadyExistsException.class)
-                .hasMessageContaining(GIT_HUB_URL_FOUND_EXCEPTION);
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
     void updateUserNotFoundException() {
         BDDMockito.given(userRepository.existsById(anyLong()))
                 .willReturn(false);
@@ -97,23 +86,9 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUserGithubURLAlreadyExitsException() {
-        BDDMockito.given(userRepository.existsById(anyLong()))
-                .willReturn(true);
-        BDDMockito.given(userRepository.doesGitHubProfileURLExits(anyString(), anyLong()))
-                .willReturn(true);
-        assertThatThrownBy(()-> userService.updateUser(user))
-                .isInstanceOf(ResourceAlreadyExistsException.class)
-                .hasMessageContaining(GIT_HUB_URL_FOUND_EXCEPTION);
-        verify(userRepository, never()).save(any());
-    }
-
-    @Test
     void cabUpdateUser() {
         BDDMockito.given(userRepository.existsById(anyLong()))
                 .willReturn(true);
-        BDDMockito.given(userRepository.doesGitHubProfileURLExits(anyString(), anyLong()))
-                .willReturn(false);
 
         userService.updateUser(user);
         ArgumentCaptor<User> userArgumentCaptor =
